@@ -1,10 +1,15 @@
 package kodlama.io.ecommerce.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import kodlama.io.ecommerce.entities.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -13,7 +18,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "products")
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,4 +25,15 @@ public class Product {
     private int quantity;
     private double price;
     private String description;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+//    @JoinTable(
+//            name = "product_category",
+//            joinColumns = @JoinColumn(name = "category_id"),
+//            inverseJoinColumns = @JoinColumn(name = "product_id")
+//    )
+    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Category> categories = new HashSet<>();
 }
