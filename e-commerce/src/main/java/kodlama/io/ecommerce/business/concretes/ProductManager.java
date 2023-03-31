@@ -4,6 +4,7 @@ import kodlama.io.ecommerce.business.abstracts.ProductService;
 import kodlama.io.ecommerce.entities.Product;
 import kodlama.io.ecommerce.repository.ProductRepository;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductManager implements ProductService {
     private final ProductRepository repository;
+    private final ModelMapper mapper;
 
     @Override
     public List<Product> getAll() {
