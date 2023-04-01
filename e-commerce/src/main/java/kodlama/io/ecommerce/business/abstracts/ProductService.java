@@ -6,18 +6,13 @@ import kodlama.io.ecommerce.business.dto.responses.create.product.CreateProductR
 import kodlama.io.ecommerce.business.dto.responses.get.product.GetAllProductsResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.product.GetProductResponse;
 import kodlama.io.ecommerce.business.dto.responses.update.product.UpdateProductResponse;
-import kodlama.io.ecommerce.entities.Product;
 
 import java.util.List;
 
 public interface ProductService {
     List<GetAllProductsResponse> getAll();
-
     GetProductResponse getById(int id);
-
     CreateProductResponse add(CreateProductRequest request);
-
     UpdateProductResponse update(int id, UpdateProductRequest request);
-
     void delete(int id);
 }
