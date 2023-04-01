@@ -1,4 +1,4 @@
-package kodlama.io.ecommerce.business.dto.responses.get;
+package kodlama.io.ecommerce.business.dto.responses.update.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAllProductsResponse {
+public class UpdateCategoryResponse {
+    private int id;
+    private String name;
 }

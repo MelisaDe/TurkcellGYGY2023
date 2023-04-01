@@ -1,17 +1,23 @@
 package kodlama.io.ecommerce.business.abstracts;
 
+import kodlama.io.ecommerce.business.dto.requests.create.product.CreateProductRequest;
+import kodlama.io.ecommerce.business.dto.requests.update.product.UpdateProductRequest;
+import kodlama.io.ecommerce.business.dto.responses.create.product.CreateProductResponse;
+import kodlama.io.ecommerce.business.dto.responses.get.product.GetAllProductsResponse;
+import kodlama.io.ecommerce.business.dto.responses.get.product.GetProductResponse;
+import kodlama.io.ecommerce.business.dto.responses.update.product.UpdateProductResponse;
 import kodlama.io.ecommerce.entities.Product;
 
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getAll();
+    List<GetAllProductsResponse> getAll();
 
-    Product getById(int id);
+    GetProductResponse getById(int id);
 
-    Product add(Product product);
+    CreateProductResponse add(CreateProductRequest request);
 
-    Product update(int id, Product product);
+    UpdateProductResponse update(int id, UpdateProductRequest request);
 
     void delete(int id);
 }

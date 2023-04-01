@@ -1,4 +1,4 @@
-package kodlama.io.ecommerce.business.dto.responses.create;
+package kodlama.io.ecommerce.business.dto.responses.create.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateProductResponse {
+public class CreateCategoryResponse {
+    private int id;
+    private String name;
 }
