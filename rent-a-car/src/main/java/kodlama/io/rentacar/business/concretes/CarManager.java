@@ -6,10 +6,9 @@ import kodlama.io.rentacar.business.dto.requests.update.car.UpdateCarRequest;
 import kodlama.io.rentacar.business.dto.responses.create.car.CreateCarResponse;
 import kodlama.io.rentacar.business.dto.responses.get.car.GetAllCarsResponse;
 import kodlama.io.rentacar.business.dto.responses.get.car.GetCarResponse;
-import kodlama.io.rentacar.business.dto.responses.get.model.GetAllModelsResponse;
 import kodlama.io.rentacar.business.dto.responses.update.car.UpdateCarResponse;
 import kodlama.io.rentacar.entities.Car;
-import kodlama.io.rentacar.entities.Model;
+import kodlama.io.rentacar.entities.enums.State;
 import kodlama.io.rentacar.repository.CarRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -44,8 +43,10 @@ public class CarManager implements CarService {
 
     @Override
     public CreateCarResponse add(CreateCarRequest request) {
+        checkIfCarExistsByPlate(request.getPlate());
         Car car = mapper.map(request, Car.class);
         car.setId(0);
+        car.setState(State.AVAILABLE);
         repository.save(car);
         CreateCarResponse response = mapper.map(car, CreateCarResponse.class);
         return response;
@@ -67,13 +68,13 @@ public class CarManager implements CarService {
         repository.deleteById(id);
     }
 
-    //İş kuralları
+    //BusinessRules
     private void checkIfCarExistsById(int id) {
         if (!repository.existsById(id)) throw new IllegalArgumentException("Böyle bir araba mevcut değil.");
     }
 
-    private void checkIfCarExistsByName(String plate){
-//        if (repository.existsByNameIgnoreCase(plate))
-//            throw new IllegalArgumentException("Bu araba zaten mevcut.");
+    private void checkIfCarExistsByPlate(String plate){
+        if (repository.existsByPlateIgnoreCase(plate))
+            throw new IllegalArgumentException("Bu araba zaten mevcut.");
     }
 }
