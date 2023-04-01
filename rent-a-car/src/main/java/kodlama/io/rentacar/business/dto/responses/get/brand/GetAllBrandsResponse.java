@@ -1,9 +1,12 @@
-package kodlama.io.rentacar.business.dto.responses.get;
+package kodlama.io.rentacar.business.dto.responses.get.brand;
 
+import kodlama.io.rentacar.business.dto.responses.get.model.GetAllModelsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,4 +15,5 @@ import lombok.Setter;
 public class GetAllBrandsResponse {
     private int id;
     private String name;
+    //private List<GetAllModelsResponse> models;
 }

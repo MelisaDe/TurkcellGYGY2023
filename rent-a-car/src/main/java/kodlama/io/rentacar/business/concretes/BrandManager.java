@@ -1,20 +1,18 @@
 package kodlama.io.rentacar.business.concretes;
 
 import kodlama.io.rentacar.business.abstracts.BrandService;
-import kodlama.io.rentacar.business.dto.requests.create.CreateBrandRequest;
-import kodlama.io.rentacar.business.dto.requests.update.UpdateBrandRequest;
-import kodlama.io.rentacar.business.dto.responses.create.CreateBrandResponse;
-import kodlama.io.rentacar.business.dto.responses.get.GetAllBrandsResponse;
-import kodlama.io.rentacar.business.dto.responses.get.GetBrandResponse;
-import kodlama.io.rentacar.business.dto.responses.update.UpdateBrandResponse;
+import kodlama.io.rentacar.business.dto.requests.create.brand.CreateBrandRequest;
+import kodlama.io.rentacar.business.dto.requests.update.brand.UpdateBrandRequest;
+import kodlama.io.rentacar.business.dto.responses.create.brand.CreateBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.get.brand.GetAllBrandsResponse;
+import kodlama.io.rentacar.business.dto.responses.get.brand.GetBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.update.brand.UpdateBrandResponse;
 import kodlama.io.rentacar.entities.Brand;
 import kodlama.io.rentacar.repository.BrandRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.net.CacheResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,7 +34,7 @@ public class BrandManager implements BrandService {
 
     @Override
     public GetBrandResponse getById(int id) {
-        checkIfBrandExists(id);
+        checkIfBrandExistsById(id);
         Brand brand = repository.findById(id).orElseThrow();
         GetBrandResponse response = mapper.map(brand, GetBrandResponse.class);
         return response;
@@ -44,6 +42,7 @@ public class BrandManager implements BrandService {
 
     @Override
     public CreateBrandResponse add(CreateBrandRequest request) {
+        checkIfBrandExistsByName(request.getName());
         Brand brand = mapper.map(request, Brand.class);
         brand.setId(0); //id db'de varsa update ediyor, yoksa ekleme yapıyor. 0 olmayacağı için 0 yazıyoruz
         repository.save(brand);
@@ -53,7 +52,7 @@ public class BrandManager implements BrandService {
 
     @Override
     public UpdateBrandResponse update(int id, UpdateBrandRequest request) {
-        checkIfBrandExists(id);
+        checkIfBrandExistsById(id);
         Brand brand = mapper.map(request, Brand.class);
         brand.setId(id);
         repository.save(brand);
@@ -63,13 +62,18 @@ public class BrandManager implements BrandService {
 
     @Override
     public void delete(int id) {
-        checkIfBrandExists(id);
+        checkIfBrandExistsById(id);
         repository.deleteById(id);
     }
 
     //Business Rules
-    private void checkIfBrandExists(int id) {
+    private void checkIfBrandExistsById(int id) {
         if (!repository.existsById(id)) throw new IllegalArgumentException("Böyle bir marka mevcut değil.");
+    }
+
+    private void checkIfBrandExistsByName(String name){
+        if (repository.existsByNameIgnoreCase(name))
+            throw new IllegalArgumentException("Bu marka zaten mevcut.");
     }
 
 }

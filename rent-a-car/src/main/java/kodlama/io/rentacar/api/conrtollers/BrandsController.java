@@ -1,13 +1,12 @@
 package kodlama.io.rentacar.api.conrtollers;
 
 import kodlama.io.rentacar.business.abstracts.BrandService;
-import kodlama.io.rentacar.business.dto.requests.create.CreateBrandRequest;
-import kodlama.io.rentacar.business.dto.requests.update.UpdateBrandRequest;
-import kodlama.io.rentacar.business.dto.responses.create.CreateBrandResponse;
-import kodlama.io.rentacar.business.dto.responses.get.GetAllBrandsResponse;
-import kodlama.io.rentacar.business.dto.responses.get.GetBrandResponse;
-import kodlama.io.rentacar.business.dto.responses.update.UpdateBrandResponse;
-import kodlama.io.rentacar.entities.Brand;
+import kodlama.io.rentacar.business.dto.requests.create.brand.CreateBrandRequest;
+import kodlama.io.rentacar.business.dto.requests.update.brand.UpdateBrandRequest;
+import kodlama.io.rentacar.business.dto.responses.create.brand.CreateBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.get.brand.GetAllBrandsResponse;
+import kodlama.io.rentacar.business.dto.responses.get.brand.GetBrandResponse;
+import kodlama.io.rentacar.business.dto.responses.update.brand.UpdateBrandResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
