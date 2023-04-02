@@ -23,13 +23,12 @@ public class CarManager implements CarService {
     private final ModelMapper mapper;
 
     @Override
-    public List<GetAllCarsResponse> getAll() {
-        List<Car> cars = repository.findAll();
+    public List<GetAllCarsResponse> getAll(int preference) {
+        List<Car> cars = chooseCarList(preference);
         List<GetAllCarsResponse> responses = cars
                 .stream()
                 .map(car -> mapper.map(car, GetAllCarsResponse.class))
                 .toList();
-
         return responses;
     }
 
@@ -73,8 +72,20 @@ public class CarManager implements CarService {
         if (!repository.existsById(id)) throw new IllegalArgumentException("Böyle bir araba mevcut değil.");
     }
 
-    private void checkIfCarExistsByPlate(String plate){
+    private void checkIfCarExistsByPlate(String plate) {
         if (repository.existsByPlateIgnoreCase(plate))
             throw new IllegalArgumentException("Bu araba zaten mevcut.");
+    }
+
+    public List<Car> chooseCarList(int preference) {
+        //0-all cars
+        //1-not show maintenance cars
+        List<Car> cars;
+        if (preference == 0) {
+            cars = repository.findAll();
+        } else {
+            cars = repository.findAllByStateNot(State.MAINTENANCE);
+        }
+        return cars;
     }
 }

@@ -19,9 +19,9 @@ import java.util.List;
 public class CarsController {
     private final CarService service;
 
-    @GetMapping
-    public List<GetAllCarsResponse> findAll(){
-        return service.getAll();
+    @GetMapping("/filter/{pref}")
+    public List<GetAllCarsResponse> findAll(@RequestParam int pref) {
+        return service.getAll(pref);
     }
 
     @GetMapping("/{id}")
