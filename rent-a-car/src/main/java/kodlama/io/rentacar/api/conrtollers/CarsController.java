@@ -19,9 +19,9 @@ import java.util.List;
 public class CarsController {
     private final CarService service;
 
-    @GetMapping("/filter/{pref}")
-    public List<GetAllCarsResponse> findAll(@RequestParam int pref) {
-        return service.getAll(pref);
+    @GetMapping
+    public List<GetAllCarsResponse> findAll(@RequestParam(defaultValue = "true") boolean includeMaintenance){
+        return service.getAll(includeMaintenance);
     }
 
     @GetMapping("/{id}")
@@ -29,7 +29,7 @@ public class CarsController {
         return service.getById(id);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateCarResponse add(@RequestBody CreateCarRequest request) {
         return service.add(request);

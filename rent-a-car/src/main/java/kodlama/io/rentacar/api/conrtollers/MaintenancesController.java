@@ -19,7 +19,7 @@ import java.util.List;
 public class MaintenancesController {
     private final MaintenanceService service;
     @GetMapping
-    List<GetAllMaintenancesResponse> getAll(){
+    public List<GetAllMaintenancesResponse> getAll(){
         return  service.getAll();
     }
     @GetMapping("/{id}")
@@ -33,6 +33,10 @@ public class MaintenancesController {
         return  service.add(request);
     }
 
+    @PutMapping("/return/{carId}")
+    public GetMaintenanceResponse returnCarFromMaintenance(@PathVariable int carId){
+        return service.returnCarFromMaintenance(carId);
+    }
     @PutMapping("/{id}")
     public UpdateMaintenanceResponse update(@PathVariable int id, @RequestBody UpdateMaintenanceRequest request){
         return service.update(id,request);

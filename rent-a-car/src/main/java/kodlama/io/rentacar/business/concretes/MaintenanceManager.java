@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,18 +46,32 @@ public class MaintenanceManager implements MaintenanceService {
     }
 
     @Override
+    public GetMaintenanceResponse returnCarFromMaintenance(int carId) {
+        checkIfCarExists(carId);
+        Maintenance maintenance = repository.findByCarIdAndIsCompletedIsFalse(carId);
+        checkIfCarIsNotUnderMaintenance(carId);
+        maintenance.setCompleted(true);
+        maintenance.setEndDate(LocalDateTime.now());
+        repository.save(maintenance); //update
+        carService.changeState(carId, State.AVAILABLE);
+        GetMaintenanceResponse response = mapper.map(maintenance, GetMaintenanceResponse.class);
+        return response;
+    }
+
+    @Override
     public CreateMaintenanceResponse add(CreateMaintenanceRequest request) {
-        GetCarResponse carResponse = carService.getById(request.getCarId());
-        checkIfCarAvailable(carResponse.getState());
+        checkIfCarExists(request.getCarId());
+        checkIfCarUnderMaintenance(request);
+        checkCarAvailabilityForMaintenance(request);
 
         Maintenance maintenance = mapper.map(request, Maintenance.class);
         maintenance.setId(0);
-
-        carResponse.setState(State.MAINTENANCE);
-        carService.update(carResponse.getId(), mapper.map(carResponse, UpdateCarRequest.class));
+        maintenance.setCompleted(false);
+        maintenance.setStartDate(LocalDateTime.now());
+        maintenance.setEndDate(null);
 
         repository.save(maintenance);
-
+        carService.changeState(request.getCarId(), State.MAINTENANCE);
         CreateMaintenanceResponse response = mapper.map(maintenance, CreateMaintenanceResponse.class);
         return response;
     }
@@ -64,16 +79,10 @@ public class MaintenanceManager implements MaintenanceService {
     @Override
     public UpdateMaintenanceResponse update(int id, UpdateMaintenanceRequest request) {
         checkIfMaintenanceExist(id);
-        GetCarResponse carResponse = carService.getById(request.getCarId());
-
+        checkIfCarExists(request.getCarId());
         Maintenance maintenance = mapper.map(request, Maintenance.class);
         maintenance.setId(id);
-
-        carResponse.setState(State.AVAILABLE);
-        carService.update(carResponse.getId(), mapper.map(carResponse, UpdateCarRequest.class));
-
         repository.save(maintenance);
-
         UpdateMaintenanceResponse response = mapper.map(maintenance, UpdateMaintenanceResponse.class);
         return response;
     }
@@ -84,13 +93,29 @@ public class MaintenanceManager implements MaintenanceService {
         repository.deleteById(id);
     }
 
+
     //BusinessRules
+
     private void checkIfMaintenanceExist(int id) {
         if (!repository.existsById(id)) throw new IllegalArgumentException("There is no such a maintenance!");
     }
+    private void checkIfCarExists(int carId) {
+        if(carService.getById(carId) == null)
+            throw new IllegalArgumentException("Böyle bir araç bulunamadı!");
+    }
 
-    private void checkIfCarAvailable(State state) {
-        if (state != State.AVAILABLE) throw new IllegalArgumentException("The car is not available!");
+    private void checkIfCarUnderMaintenance(CreateMaintenanceRequest request) {
+        if(repository.existsByCarIdAndIsCompletedIsFalse(request.getCarId()))
+            throw new IllegalArgumentException("Araç şu anda bakımda!");
+    }
+    private void checkIfCarIsNotUnderMaintenance(int carId) {
+        if(!repository.existsByCarIdAndIsCompletedIsFalse(carId))
+            throw new IllegalArgumentException("Bakımda böyle bir araç bulunamadı!");
+    }
+
+    private void checkCarAvailabilityForMaintenance(CreateMaintenanceRequest request) {
+        if(carService.getById(request.getCarId()).getState().equals(State.RENT))
+            throw new IllegalArgumentException("Araç kirada olduğu için bakıma alınamaz!");
     }
 
 }

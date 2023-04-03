@@ -23,8 +23,8 @@ public class CarManager implements CarService {
     private final ModelMapper mapper;
 
     @Override
-    public List<GetAllCarsResponse> getAll(int preference) {
-        List<Car> cars = chooseCarList(preference);
+    public List<GetAllCarsResponse> getAll(boolean includeMaintenance) {
+        List<Car> cars = filterCarsByMaintenanceState(includeMaintenance);
         List<GetAllCarsResponse> responses = cars
                 .stream()
                 .map(car -> mapper.map(car, GetAllCarsResponse.class))
@@ -67,6 +67,14 @@ public class CarManager implements CarService {
         repository.deleteById(id);
     }
 
+    @Override
+    public void changeState(int carId, State state) {
+        Car car = repository.findById(carId).orElseThrow();
+        car.setState(state);
+        repository.save(car);
+    }
+
+
     //BusinessRules
     private void checkIfCarExistsById(int id) {
         if (!repository.existsById(id)) throw new IllegalArgumentException("Böyle bir araba mevcut değil.");
@@ -77,15 +85,10 @@ public class CarManager implements CarService {
             throw new IllegalArgumentException("Bu araba zaten mevcut.");
     }
 
-    public List<Car> chooseCarList(int preference) {
-        //0-all cars
-        //1-not show maintenance cars
-        List<Car> cars;
-        if (preference == 0) {
-            cars = repository.findAll();
-        } else {
-            cars = repository.findAllByStateNot(State.MAINTENANCE);
+    public List<Car> filterCarsByMaintenanceState(boolean includeMaintenance) {
+        if (includeMaintenance) {
+            return repository.findAll();
         }
-        return cars;
+        return repository.findAllByStateIsNot(State.MAINTENANCE);
     }
 }
