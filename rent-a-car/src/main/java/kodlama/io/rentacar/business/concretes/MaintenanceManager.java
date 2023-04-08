@@ -90,6 +90,7 @@ public class MaintenanceManager implements MaintenanceService {
     @Override
     public void delete(int id) {
         checkIfMaintenanceExist(id);
+        makeCarAvailableIdIsCompletedFalse(id);
         repository.deleteById(id);
     }
 
@@ -114,8 +115,14 @@ public class MaintenanceManager implements MaintenanceService {
     }
 
     private void checkCarAvailabilityForMaintenance(CreateMaintenanceRequest request) {
-        if(carService.getById(request.getCarId()).getState().equals(State.RENT))
+        if(carService.getById(request.getCarId()).getState().equals(State.RENTED))
             throw new IllegalArgumentException("Araç kirada olduğu için bakıma alınamaz!");
+    }
+
+    private void makeCarAvailableIdIsCompletedFalse(int id) {
+        int carId = repository.findById(id).get().getCar().getId();
+        if(repository.existsByCarIdAndIsCompletedIsFalse(carId))
+            carService.changeState(carId, State.AVAILABLE);
     }
 
 }
