@@ -1,5 +1,6 @@
 package kodlama.io.rentacar.api.conrtollers;
 
+import jakarta.validation.Valid;
 import kodlama.io.rentacar.business.abstracts.PaymentService;
 import kodlama.io.rentacar.business.dto.requests.create.payment.CreatePaymentRequest;
 import kodlama.io.rentacar.business.dto.requests.update.payment.UpdatePaymentRequest;
@@ -29,12 +30,12 @@ public class PaymentsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatePaymentResponse add(@RequestBody CreatePaymentRequest request){
+    public CreatePaymentResponse add(@Valid @RequestBody CreatePaymentRequest request){
         return  service.add(request);
     }
 
     @PutMapping("/{id}")
-    public UpdatePaymentResponse update(@PathVariable int id, @RequestBody UpdatePaymentRequest request){
+    public UpdatePaymentResponse update(@PathVariable int id,@Valid @RequestBody UpdatePaymentRequest request){
         return service.update(id,request);
     }
 
