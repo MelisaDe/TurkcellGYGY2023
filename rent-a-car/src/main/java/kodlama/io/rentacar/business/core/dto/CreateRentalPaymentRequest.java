@@ -1,4 +1,4 @@
-package kodlama.io.rentacar.business.dto.requests.update.payment;
+package kodlama.io.rentacar.business.core.dto;
 
 import kodlama.io.rentacar.business.dto.requests.PaymentRequest;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdatePaymentRequest extends PaymentRequest {
-    private double balance;
+public class CreateRentalPaymentRequest extends PaymentRequest {
+    private double price;
 }
-
