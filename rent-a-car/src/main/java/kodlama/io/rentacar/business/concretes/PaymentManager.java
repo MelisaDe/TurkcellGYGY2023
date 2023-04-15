@@ -2,7 +2,7 @@ package kodlama.io.rentacar.business.concretes;
 
 import kodlama.io.rentacar.business.abstracts.PaymentService;
 import kodlama.io.rentacar.business.abstracts.PosService;
-import kodlama.io.rentacar.business.core.dto.CreateRentalPaymentRequest;
+import kodlama.io.rentacar.common.dto.CreateRentalPaymentRequest;
 import kodlama.io.rentacar.business.dto.requests.create.payment.CreatePaymentRequest;
 import kodlama.io.rentacar.business.dto.requests.update.payment.UpdatePaymentRequest;
 import kodlama.io.rentacar.business.dto.responses.create.payment.CreatePaymentResponse;
