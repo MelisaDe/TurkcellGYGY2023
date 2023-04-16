@@ -105,7 +105,6 @@ public class RentalManager implements RentalService {
         repository.deleteById(id);
     }
 
-    //BusinessRules
     private double getTotalPrice(Rental rental) {
         return rental.getDailyPrice() * rental.getRentedForDays();
     }

@@ -3,13 +3,12 @@ package kodlama.io.rentacar.business.concretes;
 import kodlama.io.rentacar.business.abstracts.CarService;
 import kodlama.io.rentacar.business.abstracts.MaintenanceService;
 import kodlama.io.rentacar.business.dto.requests.create.maintenance.CreateMaintenanceRequest;
-import kodlama.io.rentacar.business.dto.requests.update.car.UpdateCarRequest;
 import kodlama.io.rentacar.business.dto.requests.update.maintenance.UpdateMaintenanceRequest;
 import kodlama.io.rentacar.business.dto.responses.create.maintenance.CreateMaintenanceResponse;
-import kodlama.io.rentacar.business.dto.responses.get.car.GetCarResponse;
 import kodlama.io.rentacar.business.dto.responses.get.maintenance.GetAllMaintenancesResponse;
 import kodlama.io.rentacar.business.dto.responses.get.maintenance.GetMaintenanceResponse;
 import kodlama.io.rentacar.business.dto.responses.update.maintenance.UpdateMaintenanceResponse;
+import kodlama.io.rentacar.business.rules.MaintenanceBusinessRules;
 import kodlama.io.rentacar.entities.Maintenance;
 import kodlama.io.rentacar.entities.enums.State;
 import kodlama.io.rentacar.repository.MaintenanceRepository;
@@ -26,6 +25,7 @@ public class MaintenanceManager implements MaintenanceService {
     private final MaintenanceRepository repository;
     private final ModelMapper mapper;
     private final CarService carService;
+    private final MaintenanceBusinessRules rules;
 
     @Override
     public List<GetAllMaintenancesResponse> getAll() {
@@ -39,7 +39,7 @@ public class MaintenanceManager implements MaintenanceService {
 
     @Override
     public GetMaintenanceResponse getById(int id) {
-        checkIfMaintenanceExist(id);
+        rules.checkIfMaintenanceExist(id);
         Maintenance maintenance = repository.findById(id).orElseThrow();
         GetMaintenanceResponse response = mapper.map(maintenance, GetMaintenanceResponse.class);
         return response;
@@ -47,9 +47,8 @@ public class MaintenanceManager implements MaintenanceService {
 
     @Override
     public GetMaintenanceResponse returnCarFromMaintenance(int carId) {
-        checkIfCarExists(carId);
         Maintenance maintenance = repository.findByCarIdAndIsCompletedIsFalse(carId);
-        checkIfCarIsNotUnderMaintenance(carId);
+        rules.checkIfCarIsNotUnderMaintenance(carId);
         maintenance.setCompleted(true);
         maintenance.setEndDate(LocalDateTime.now());
         repository.save(maintenance); //update
@@ -60,9 +59,8 @@ public class MaintenanceManager implements MaintenanceService {
 
     @Override
     public CreateMaintenanceResponse add(CreateMaintenanceRequest request) {
-        checkIfCarExists(request.getCarId());
-        checkIfCarUnderMaintenance(request);
-        checkCarAvailabilityForMaintenance(request);
+        rules.checkIfCarUnderMaintenance(request);
+        rules.checkCarAvailabilityForMaintenance(carService.getById(request.getCarId()).getState());
 
         Maintenance maintenance = mapper.map(request, Maintenance.class);
         maintenance.setId(0);
@@ -78,8 +76,7 @@ public class MaintenanceManager implements MaintenanceService {
 
     @Override
     public UpdateMaintenanceResponse update(int id, UpdateMaintenanceRequest request) {
-        checkIfMaintenanceExist(id);
-        checkIfCarExists(request.getCarId());
+        rules.checkIfMaintenanceExist(id);
         Maintenance maintenance = mapper.map(request, Maintenance.class);
         maintenance.setId(id);
         repository.save(maintenance);
@@ -89,34 +86,9 @@ public class MaintenanceManager implements MaintenanceService {
 
     @Override
     public void delete(int id) {
-        checkIfMaintenanceExist(id);
+        rules.checkIfMaintenanceExist(id);
         makeCarAvailableIdIsCompletedFalse(id);
         repository.deleteById(id);
-    }
-
-
-    //BusinessRules
-
-    private void checkIfMaintenanceExist(int id) {
-        if (!repository.existsById(id)) throw new IllegalArgumentException("There is no such a maintenance!");
-    }
-    private void checkIfCarExists(int carId) {
-        if(carService.getById(carId) == null)
-            throw new IllegalArgumentException("Böyle bir araç bulunamadı!");
-    }
-
-    private void checkIfCarUnderMaintenance(CreateMaintenanceRequest request) {
-        if(repository.existsByCarIdAndIsCompletedIsFalse(request.getCarId()))
-            throw new IllegalArgumentException("Araç şu anda bakımda!");
-    }
-    private void checkIfCarIsNotUnderMaintenance(int carId) {
-        if(!repository.existsByCarIdAndIsCompletedIsFalse(carId))
-            throw new IllegalArgumentException("Bakımda böyle bir araç bulunamadı!");
-    }
-
-    private void checkCarAvailabilityForMaintenance(CreateMaintenanceRequest request) {
-        if(carService.getById(request.getCarId()).getState().equals(State.RENTED))
-            throw new IllegalArgumentException("Araç kirada olduğu için bakıma alınamaz!");
     }
 
     private void makeCarAvailableIdIsCompletedFalse(int id) {
