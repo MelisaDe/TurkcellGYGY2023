@@ -14,6 +14,7 @@ import kodlama.io.rentacar.business.dto.responses.create.rental.CreateRentalResp
 import kodlama.io.rentacar.business.dto.responses.get.rental.GetAllRentalResponse;
 import kodlama.io.rentacar.business.dto.responses.get.rental.GetRentalResponse;
 import kodlama.io.rentacar.business.dto.responses.update.rental.UpdateRentalResponse;
+import kodlama.io.rentacar.entities.Car;
 import kodlama.io.rentacar.entities.Rental;
 import kodlama.io.rentacar.entities.enums.State;
 import kodlama.io.rentacar.repository.RentalRepository;
@@ -60,6 +61,7 @@ public class RentalManager implements RentalService {
         rental.setTotalPrice(getTotalPrice(rental));
         rental.setStartDate(LocalDateTime.now());
 
+
         //CreatePayment
         CreateRentalPaymentRequest paymentRequest = new CreateRentalPaymentRequest();
         mapper.map(request.getPaymentRequest(), paymentRequest);
@@ -71,8 +73,14 @@ public class RentalManager implements RentalService {
         CreateRentalResponse response = mapper.map(rental, CreateRentalResponse.class);
 
         //CreateInvoice
+        /*
+        Car car = mapper.map(carService.getById(request.getCarId()), Car.class);
+        rental.setCar(car);
+        System.err.println(rental.getCar().getModel().getBrand().getName());
+        System.err.println(rental.getCar().getModel().getName());
+        */
         CreateInvoiceRequest invoiceRequest = new CreateInvoiceRequest();
-        createInvoiceRequest(request, invoiceRequest);
+        createInvoiceRequest(request, invoiceRequest, rental);
         invoiceService.add(invoiceRequest);
 
         return response;
@@ -102,10 +110,10 @@ public class RentalManager implements RentalService {
         return rental.getDailyPrice() * rental.getRentedForDays();
     }
 
-    private void createInvoiceRequest(CreateRentalRequest request, CreateInvoiceRequest invoiceRequest) {
+    private void createInvoiceRequest(CreateRentalRequest request, CreateInvoiceRequest invoiceRequest, Rental rental) {
         GetCarResponse car = carService.getById(request.getCarId());
 
-        invoiceRequest.setCarId(request.getCarId());
+        invoiceRequest.setRentedAt(rental.getStartDate());
         invoiceRequest.setModelName(car.getModelName());
         invoiceRequest.setBrandName(car.getModelBrandName());
         invoiceRequest.setDailyPrice(request.getDailyPrice());

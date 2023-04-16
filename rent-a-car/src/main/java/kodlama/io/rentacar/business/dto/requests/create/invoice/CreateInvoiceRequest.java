@@ -15,8 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateInvoiceRequest {
-    @NotNull
-    private int carId;
     @NotBlank
     private String cardHolder;
     @NotBlank
@@ -34,6 +32,8 @@ public class CreateInvoiceRequest {
     @NotNull
     @Min(0)
     private int rentedForDays;
+
+    private LocalDateTime rentedAt;
 }
 
 
