@@ -16,6 +16,6 @@ public class CarBusinessRules {
     }
     public void checkIfCarExistsByPlate(String plate) {
         if (repository.existsByPlateIgnoreCase(plate))
-            throw new BusinessException(Messages.Car.Exists);
+            throw new BusinessException(Messages.Car.PlateExists);
     }
 }
